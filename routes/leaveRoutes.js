@@ -41,8 +41,7 @@ router.post("/register", async (req, res) => {
         const cleanEmail = email.trim().toLowerCase();
         const cleanRollNumber = rollNumber.trim();
 
-        // Validate email
-        const emailRegex = deepisadha308@gmail.com;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!emailRegex.test(cleanEmail)) {
             return res.status(400).json({
@@ -50,7 +49,6 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Validate leave balances
         const casual = Number(casualLeave);
         const medical = Number(medicalLeave);
 
@@ -71,7 +69,6 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Check existing email or roll number
         const existingUser = await User.findOne({
             $or: [
                 { email: cleanEmail },
@@ -85,7 +82,6 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Hash password before saving
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await User.create({
@@ -106,7 +102,6 @@ router.post("/register", async (req, res) => {
             casualLeave: newUser.casualLeave,
             medicalLeave: newUser.medicalLeave
         });
-
     } catch (error) {
         console.error("Registration error:", error);
 
@@ -151,7 +146,7 @@ router.post("/login", async (req, res) => {
 
         if (!user || !user.password) {
             return res.status(401).json({
-                message: "Invalid email or password. Please register with a password."
+                message: "Invalid email or password."
             });
         }
 
@@ -175,7 +170,6 @@ router.post("/login", async (req, res) => {
             casualLeave: user.casualLeave,
             medicalLeave: user.medicalLeave
         });
-
     } catch (error) {
         console.error("Login error:", error);
 
@@ -208,7 +202,6 @@ router.get("/leave-balance/:id", async (req, res) => {
             casualLeave: user.casualLeave,
             medicalLeave: user.medicalLeave
         });
-
     } catch (error) {
         console.error("Leave balance error:", error);
 
@@ -279,7 +272,6 @@ async function applyLeave(req, res) {
             casualLeave: user.casualLeave,
             medicalLeave: user.medicalLeave
         });
-
     } catch (error) {
         console.error("Apply leave error:", error);
 
@@ -289,7 +281,6 @@ async function applyLeave(req, res) {
     }
 }
 
-// Support both leave application URLs
 router.post("/apply-leave/:id", applyLeave);
 router.post("/leave/:id", applyLeave);
 

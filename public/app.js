@@ -1,4 +1,3 @@
-
 let userId = null;
 
 // Show a message
@@ -18,34 +17,42 @@ function showLoginForm() {
     document.getElementById("login-section").style.display = "block";
 }
 
-// Register user
+// User registration
 async function registerUser(event) {
     event.preventDefault();
 
     const username = document.getElementById("username").value.trim();
     const email = document.getElementById("reg-email").value.trim();
+
+    // Correct registration password ID
     const password = document.getElementById("reg-password").value;
+
     const rollNumber = document.getElementById("roll-number").value.trim();
     const casualLeave = Number(document.getElementById("casual-leave").value);
     const medicalLeave = Number(document.getElementById("medical-leave").value);
 
     if (!username || !email || !password.trim() || !rollNumber) {
-        showMessage("registration-response", "Please fill in all required fields, including password.");
+        showMessage(
+            "registration-response",
+            "Please fill in all required fields."
+        );
         return;
     }
 
-    if (!Number.isInteger(casualLeave) || casualLeave < 0 ||
-        !Number.isInteger(medicalLeave) || medicalLeave < 0) {
-        showMessage("registration-response", "Enter valid leave balances.");
+    if (password.length < 6) {
+        showMessage(
+            "registration-response",
+            "Password must be at least 6 characters long."
+        );
         return;
     }
 
-    const button = document.querySelector(
+    const registerButton = document.querySelector(
         '#registration-form button[type="submit"]'
     );
 
-    button.disabled = true;
-    button.innerText = "Registering...";
+    registerButton.disabled = true;
+    registerButton.innerText = "Registering...";
 
     try {
         const response = await fetch("/api/register", {
@@ -73,36 +80,44 @@ async function registerUser(event) {
             return;
         }
 
-        document.getElementById("registration-form").reset();
-        document.getElementById("email").value = email;
-
         showMessage(
-            "response-message",
+            "registration-response",
             "Registration successful! Please log in."
         );
 
+        document.getElementById("registration-form").reset();
+        document.getElementById("email").value = email;
+
         showLoginForm();
+
     } catch (error) {
         console.error("Registration error:", error);
+
         showMessage(
             "registration-response",
             "Cannot connect to server. Check the server and try again."
         );
+
     } finally {
-        button.disabled = false;
-        button.innerText = "Register";
+        registerButton.disabled = false;
+        registerButton.innerText = "Register";
     }
 }
 
-// Login user
+// User login
 async function loginUser(event) {
     event.preventDefault();
 
     const email = document.getElementById("email").value.trim();
+
+    // Correct login password ID
     const password = document.getElementById("password").value;
 
     if (!email || !password.trim()) {
-        showMessage("response-message", "Please enter your email and password.");
+        showMessage(
+            "response-message",
+            "Please enter both email and password."
+        );
         return;
     }
 
@@ -112,7 +127,10 @@ async function loginUser(event) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({
+                email,
+                password
+            })
         });
 
         const data = await response.json();
@@ -125,17 +143,19 @@ async function loginUser(event) {
             return;
         }
 
-        userId = data.userId || data._id;
+        userId = data.userId;
 
-        if (!userId) {
-            showMessage("response-message", "Login response is missing the user ID.");
-            return;
-        }
+        document.getElementById("username-display").innerText =
+            data.username || "";
 
-        document.getElementById("username-display").innerText = data.username;
-        document.getElementById("roll-number-display").innerText = data.rollNumber;
-        document.getElementById("casual-leave-display").innerText = data.casualLeave;
-        document.getElementById("medical-leave-display").innerText = data.medicalLeave;
+        document.getElementById("roll-number-display").innerText =
+            data.rollNumber || "";
+
+        document.getElementById("casual-leave-display").innerText =
+            data.casualLeave ?? 0;
+
+        document.getElementById("medical-leave-display").innerText =
+            data.medicalLeave ?? 0;
 
         document.getElementById("login-section").style.display = "none";
         document.getElementById("registration-section").style.display = "none";
@@ -143,14 +163,22 @@ async function loginUser(event) {
         document.getElementById("apply-leave-section").style.display = "block";
         document.getElementById("logout-button").style.display = "inline-block";
 
-        showMessage("response-message", "Login successful.");
+        showMessage(
+            "response-message",
+            data.message || "Login successful."
+        );
+
     } catch (error) {
         console.error("Login error:", error);
-        showMessage("response-message", "Cannot connect to server.");
+
+        showMessage(
+            "response-message",
+            "Cannot connect to server. Check the server and try again."
+        );
     }
 }
 
-// Logout user
+// User logout
 function logoutUser() {
     userId = null;
 
@@ -165,11 +193,10 @@ function logoutUser() {
 
     document.getElementById("username-display").innerText = "";
     document.getElementById("roll-number-display").innerText = "";
-    document.getElementById("casual-leave-display").innerText = "—";
-    document.getElementById("medical-leave-display").innerText = "—";
+    document.getElementById("casual-leave-display").innerText = "0";
+    document.getElementById("medical-leave-display").innerText = "0";
 
     showMessage("response-message", "");
-    showMessage("registration-response", "");
 }
 
 // Refresh leave balance
@@ -184,17 +211,28 @@ async function refreshLeaveBalance() {
         const data = await response.json();
 
         if (!response.ok) {
-            showMessage("response-message", data.message || "Could not get balance.");
+            showMessage(
+                "response-message",
+                data.message || "Could not get balance."
+            );
             return;
         }
 
-        document.getElementById("casual-leave-display").innerText = data.casualLeave;
-        document.getElementById("medical-leave-display").innerText = data.medicalLeave;
+        document.getElementById("casual-leave-display").innerText =
+            data.casualLeave;
+
+        document.getElementById("medical-leave-display").innerText =
+            data.medicalLeave;
 
         showMessage("response-message", "Leave balance refreshed.");
+
     } catch (error) {
         console.error("Balance error:", error);
-        showMessage("response-message", "Cannot connect to server.");
+
+        showMessage(
+            "response-message",
+            "Cannot connect to server."
+        );
     }
 }
 
@@ -211,7 +249,10 @@ async function applyLeave(event) {
     const days = Number(document.getElementById("leave-days").value);
 
     if (!Number.isInteger(days) || days <= 0) {
-        showMessage("response-message", "Enter a valid positive number of days.");
+        showMessage(
+            "response-message",
+            "Enter a valid positive number of days."
+        );
         return;
     }
 
@@ -221,24 +262,42 @@ async function applyLeave(event) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ type, days })
+            body: JSON.stringify({
+                type,
+                days
+            })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            showMessage("response-message", data.message || "Leave application failed.");
+            showMessage(
+                "response-message",
+                data.message || "Leave application failed."
+            );
             return;
         }
 
-        document.getElementById("casual-leave-display").innerText = data.casualLeave;
-        document.getElementById("medical-leave-display").innerText = data.medicalLeave;
+        document.getElementById("casual-leave-display").innerText =
+            data.casualLeave;
 
-        showMessage("response-message", data.message || "Leave applied successfully.");
+        document.getElementById("medical-leave-display").innerText =
+            data.medicalLeave;
+
+        showMessage(
+            "response-message",
+            data.message || "Leave application successful."
+        );
+
         document.getElementById("leave-form").reset();
+
     } catch (error) {
         console.error("Leave application error:", error);
-        showMessage("response-message", "Cannot connect to server.");
+
+        showMessage(
+            "response-message",
+            "Cannot connect to server."
+        );
     }
 }
 
