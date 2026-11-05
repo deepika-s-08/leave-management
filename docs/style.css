@@ -1,0 +1,132 @@
+
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    padding: 20px;
+}
+
+/* Container Styles */
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading Styles */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2457a7;
+}
+
+h2 {
+    margin-bottom: 15px;
+    color: #2457a7;
+}
+
+/* Form Section Styles */
+.form-section {
+    margin-bottom: 30px;
+}
+
+/* Label Styles */
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+/* Input and Select Styles */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+/* Button Styles */
+.btn {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #4cae4c;
+}
+
+/* Link Button Styles */
+.link-btn {
+    background: none;
+    color: #007bff;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+.link-btn:hover {
+    text-decoration: underline;
+}
+
+/* Response Message Styles */
+#response-message,
+#registration-response {
+    margin-top: 15px;
+    overflow-wrap: anywhere;
+}
+
+/* Balance Section Styles */
+#balance-section {
+    margin-top: 20px;
+}
+
+/* Apply Leave Section Styles */
+#apply-leave-section {
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .container {
+        width: 100%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+
+    .btn {
+        font-size: 14px;
+    }
+
+    label {
+        font-size: 14px;
+    }
+
+    input,
+    select {
+        font-size: 14px;
+    }
+}
