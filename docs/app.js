@@ -1,7 +1,7 @@
 
 let userId = null;
 
-const API_URL = "https://leave-management-gfsp.onrender.com";
+const API_URL = "https://leave-management-1-2w2y.onrender.com";
 
 // Show a message
 function showMessage(elementId, message) {
